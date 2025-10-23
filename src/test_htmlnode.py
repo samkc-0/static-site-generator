@@ -1,4 +1,4 @@
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 import pytest
 
 
@@ -21,3 +21,18 @@ def test_htmlnode_repr_with_props():
         repr(node)
         == "HTMLNode(tag='div', value='Hello', children=None, props={(1 props)...})"
     )
+
+
+def test_leaf_to_html_p():
+    node = LeafNode("p", "Hello, world!")
+    assert node.to_html() == "<p>Hello, world!</p>"
+
+
+def test_leaf_requires_value():
+    with pytest.raises(ValueError):
+        node = LeafNode("p", None)
+
+
+def test_leaf_without_tag_returns_str():
+    node = LeafNode(None, "Click me")
+    assert node.to_html() == "Click me"

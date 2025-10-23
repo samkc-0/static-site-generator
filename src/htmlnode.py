@@ -1,5 +1,7 @@
 from typing import Optional
 
+Props = dict[str, str]
+
 
 class HTMLNode:
     def __init__(
@@ -7,7 +9,7 @@ class HTMLNode:
         tag: Optional[str] = None,
         value: Optional[str] = None,
         children: Optional[list["HTMLNode"]] = None,
-        props: dict[str, str] = {},
+        props: Props = {},
     ):
         self.tag = tag
         self.value = value
@@ -30,3 +32,15 @@ class HTMLNode:
             "{" + f"({len(self.props)} props)..." + "}" if len(self.props) else "{}"
         )
         return f"HTMLNode(tag='{self.tag}', value='{self.value}', children={child_count}, props={prop_count})"
+
+
+class LeafNode(HTMLNode):
+    def __init__(self, tag: str | None, value: str, props: Props = {}):
+        if value is None:
+            raise ValueError("LeafNode must have a value, got value=None")
+        super().__init__(tag, value, None, props)
+
+    def to_html(self) -> str:
+        if self.tag is None:
+            return str(self.value)
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
