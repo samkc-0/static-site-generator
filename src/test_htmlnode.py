@@ -1,4 +1,4 @@
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 import pytest
 
 
@@ -36,3 +36,31 @@ def test_leaf_requires_value():
 def test_leaf_without_tag_returns_str():
     node = LeafNode(None, "Click me")
     assert node.to_html() == "Click me"
+
+
+def test_parent_node_recursion():
+    node = ParentNode(
+        "p",
+        [
+            LeafNode("b", "Bold text"),
+            LeafNode(None, "Normal text"),
+            LeafNode("i", "italic text"),
+            LeafNode(None, "Normal text"),
+        ],
+    )
+
+    want = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+    assert node.to_html() == want, f"got {node.to_html()}, want {want}"
+
+
+def test_to_html_with_children():
+    child_node = LeafNode("span", "child")
+    parent_node = ParentNode("div", [child_node])
+    assert parent_node.to_html() == "<div><span>child</span></div>"
+
+
+def test_to_html_with_grandchildren():
+    grandchild_node = LeafNode("b", "grandchild")
+    child_node = ParentNode("span", [grandchild_node])
+    parent_node = ParentNode("div", [child_node])
+    assert parent_node.to_html() == "<div><span><b>grandchild</b></span></div>"
