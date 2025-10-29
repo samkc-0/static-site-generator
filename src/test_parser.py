@@ -1,8 +1,10 @@
 from parser import (
+    lex,
     tokenize,
     code_pattern,
     link_pattern,
     image_pattern,
+    md_to_blocks,
 )
 from textnode import TextNode, TextType
 
@@ -10,9 +12,9 @@ from textnode import TextNode, TextType
 def test_tokenize_code_block():
     tokens = list(tokenize("This is text with a `code block` word", [code_pattern]))
     assert tokens == [
-        ("This is text with a ", None),
+        ("This is text with a ", "plain"),
         ("code block", "code"),
-        (" word", None),
+        (" word", "plain"),
     ]
 
 
@@ -21,9 +23,9 @@ def test_tokenize_link():
         tokenize("This is text with an [example](www.example.com) link", [link_pattern])
     )
     assert tokens == [
-        ("This is text with an ", None),
+        ("This is text with an ", "plain"),
         ("[example](www.example.com)", "link"),
-        (" link", None),
+        (" link", "plain"),
     ]
 
 
@@ -35,7 +37,41 @@ def test_tokenize_image_takes_precedence_over_link():
         )
     )
     assert tokens == [
-        ("This is text with an ", None),
+        ("This is text with an ", "plain"),
         ("![alt text](image.png)", "image"),
-        (" image", None),
+        (" image", "plain"),
+    ]
+
+
+def test_lexer():
+    tokens = list(
+        tokenize(
+            "This is **bold text** with an [example](www.example.com) link",
+        )
+    )
+    nodes = list(lex(tokens))
+    assert nodes == [
+        TextNode("This is ", TextType.PLAIN),
+        TextNode("bold text", TextType.BOLD),
+        TextNode(" with an ", TextType.PLAIN),
+        TextNode("example", TextType.LINK, url="www.example.com"),
+        TextNode(" link", TextType.PLAIN),
+    ]
+
+
+def test_markdown_to_blocks():
+    md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+    blocks = md_to_blocks(md)
+    assert blocks == [
+        "This is **bolded** paragraph",
+        "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+        "- This is a list\n- with items",
     ]
