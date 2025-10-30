@@ -4,7 +4,6 @@ from parser import (
     code_pattern,
     link_pattern,
     image_pattern,
-    md_to_blocks,
 )
 from textnode import TextNode, TextType
 
@@ -56,22 +55,4 @@ def test_lexer():
         TextNode(" with an ", TextType.PLAIN),
         TextNode("example", TextType.LINK, url="www.example.com"),
         TextNode(" link", TextType.PLAIN),
-    ]
-
-
-def test_markdown_to_blocks():
-    md = """
-This is **bolded** paragraph
-
-This is another paragraph with _italic_ text and `code` here
-This is the same paragraph on a new line
-
-- This is a list
-- with items
-"""
-    blocks = md_to_blocks(md)
-    assert blocks == [
-        "This is **bolded** paragraph",
-        "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
-        "- This is a list\n- with items",
     ]

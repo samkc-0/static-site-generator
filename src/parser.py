@@ -67,9 +67,5 @@ def lex(
         yield parsers[tag](text)
 
 
-def md_to_blocks(text: str) -> list[str]:
-    return [line.strip() for line in text.split("\n\n")]
-
-
 def render(tokens: list[TextNode], render_func: Callable[[TextNode], str]) -> str:
     return "".join(render_func(token) for token in tokens)
