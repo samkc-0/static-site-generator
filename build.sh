@@ -9,4 +9,4 @@ if [ -z "$REPONAME" ]; then
 fi
 
 mkdir -p docs
-python src/main.py "$REPONAME/" docs
+python src/main.py "/$REPONAME/" docs
