@@ -1,5 +1,6 @@
 import pytest
-from block import BlockType, md_to_blocks, block_to_block_type
+from block import BlockType, block_to_block_type
+from helpers import md_to_blocks
 
 
 def test_markdown_to_blocks():

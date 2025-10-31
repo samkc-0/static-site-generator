@@ -1,5 +1,5 @@
 from typing import Callable, Generator
-from functools import partial
+from functools import partial, wraps
 from textnode import TextNode, TextType
 import re
 
@@ -69,3 +69,7 @@ def lex(
 
 def render(tokens: list[TextNode], render_func: Callable[[TextNode], str]) -> str:
     return "".join(render_func(token) for token in tokens)
+
+
+def parse(text: str) -> list[TextNode]:
+    return list(lex(list(tokenize(text))))
