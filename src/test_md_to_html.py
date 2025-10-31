@@ -1,8 +1,9 @@
 import re
 from functools import wraps
 from block import block_to_block_type, BlockType, matches, md_to_blocks
+from htmlnode import ParentNode
 import pytest
-from helpers import md_to_html_node
+from helpers import md_to_html_node, parse_blockquote
 
 
 test_cases = [
@@ -104,4 +105,18 @@ def test_blockquote():
     assert (
         html
         == '<div><blockquote><p>"I am in fact a Hobbit in all but size."</p><p>-- J.R.R. Tolkien</p></blockquote></div>'
+    )
+
+
+def test_blockquote_without_inner_p():
+    block = """> "I am in fact a Hobbit in all but size."
+> 
+> -- J.R.R. Tolkien"""
+    parsed = parse_blockquote(block, inner_p=False)
+    html = ParentNode("div", parsed).to_html()
+    assert (
+        html
+        == """<div><blockquote>"I am in fact a Hobbit in all but size."
+
+-- J.R.R. Tolkien</blockquote></div>"""
     )

@@ -11,7 +11,6 @@ def md_to_blocks(text: str) -> list[str]:
 
 def md_to_html_node(text: str):
     blocks = [(block, block_to_block_type(block)) for block in md_to_blocks(text)]
-    print(blocks)
     document = []
     for block, block_type in blocks:
         if block == "":
@@ -33,18 +32,7 @@ def md_to_html_node(text: str):
                 pre = ParentNode("pre", [code])
                 document.append(pre)
             case BlockType.QUOTE:
-                lines = block.split("\n")
-                blockquoted = []
-                for line in lines:
-                    cap = re.match("> ?(.*)", line)
-                    assert cap, f"impossible blockquote: {line}"
-                    blockquoted.append(cap.group(1))
-                    text_nodes = [parse(line) for line in blockquoted]
-                    paragraphs = [
-                        ParentNode("p", [text_node_to_html_node(t) for t in line])
-                        for line in text_nodes
-                        if line
-                    ]
+                paragraphs = parse_blockquote(block, inner_p=False)
                 document.append(ParentNode("blockquote", paragraphs))
             case BlockType.UNORDERED_LIST:
                 ul = list_block_to_html_node(block, "ul")
@@ -53,6 +41,28 @@ def md_to_html_node(text: str):
                 ol = list_block_to_html_node(block, "ol")
                 document.append(ol)
     return ParentNode("div", document)
+
+
+def parse_blockquote(block, inner_p=True):
+    lines = block.split("\n")
+    blockquoted = []
+    paragraphs = []
+    for line in lines:
+        cap = re.match("> ?(.*)", line)
+        assert cap, f"impossible blockquote: {line}"
+        blockquoted.append(cap.group(1))
+        text_nodes = [parse(line) for line in blockquoted]
+        if inner_p:
+            paragraphs = [
+                ParentNode("p", [text_node_to_html_node(t) for t in line])
+                for line in text_nodes
+                if line
+            ]
+        else:
+            paragraphs = [
+                text_node_to_html_node(t) for line in text_nodes for t in line
+            ]
+    return paragraphs
 
 
 def list_block_to_html_node(block: str, tag: str):
