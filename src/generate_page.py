@@ -21,3 +21,13 @@ def generate_page(src: Path, dst: Path, template: Path):
     )
     dst.parent.mkdir(exist_ok=True)
     dst.write_text(as_html)
+
+
+def generate_pages(src: Path, dst: Path, template: Path):
+    for p in src.iterdir():
+        if p.is_file() and p.name == "index.md":
+            generate_page(p, dst / f"{p.stem}.html", template)
+        if p.is_dir():
+            copied = dst / p.name
+            copied.mkdir(exist_ok=True)
+            generate_pages(p, copied, template)

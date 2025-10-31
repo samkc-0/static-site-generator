@@ -32,8 +32,8 @@ def md_to_html_node(text: str):
                 pre = ParentNode("pre", [code])
                 document.append(pre)
             case BlockType.QUOTE:
-                paragraphs = parse_blockquote(block, inner_p=False)
-                document.append(ParentNode("blockquote", paragraphs))
+                blockquote = parse_blockquote(block, inner_p=False)
+                document.append(blockquote)
             case BlockType.UNORDERED_LIST:
                 ul = list_block_to_html_node(block, "ul")
                 document.append(ul)
@@ -59,10 +59,13 @@ def parse_blockquote(block, inner_p=True):
                 if line
             ]
         else:
-            paragraphs = [
-                text_node_to_html_node(t) for line in text_nodes for t in line
-            ]
-    return paragraphs
+            paragraphs = []
+            for line in text_nodes:
+                if not line:
+                    continue
+                paragraphs.extend([text_node_to_html_node(t) for t in line])
+    blockquote = ParentNode("blockquote", paragraphs)
+    return blockquote
 
 
 def list_block_to_html_node(block: str, tag: str):

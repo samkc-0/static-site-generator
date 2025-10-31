@@ -113,10 +113,8 @@ def test_blockquote_without_inner_p():
 > 
 > -- J.R.R. Tolkien"""
     parsed = parse_blockquote(block, inner_p=False)
-    html = ParentNode("div", parsed).to_html()
+    html = ParentNode("div", [parsed]).to_html()
     assert (
         html
-        == """<div><blockquote>"I am in fact a Hobbit in all but size."
-
--- J.R.R. Tolkien</blockquote></div>"""
+        == """<div><blockquote>"I am in fact a Hobbit in all but size."-- J.R.R. Tolkien</blockquote></div>"""
     )

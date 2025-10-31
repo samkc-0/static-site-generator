@@ -1,4 +1,4 @@
-from generate_page import generate_page
+from generate_page import generate_pages
 from textnode import TextNode, TextType
 from copy_static import copy_static, empty_dir
 from pathlib import Path
@@ -11,7 +11,7 @@ def main():
     copy_static(static, public)
     content = Path("content")
     template = Path("template.html")
-    generate_page(content / "index.md", public / "index.html", template)
+    generate_pages(content, public, template)
     print("Done")
 
 

@@ -17,6 +17,7 @@ def copy_static(static: Path, public: Path):
     assert static.is_dir(), "src path must be a directory"
     assert public.is_dir(), "dst path hmust be a directory"
     for p in static.iterdir():
+        print("handling", p)
         if p.is_file():
             public.joinpath(p.name).write_bytes(p.read_bytes())
         if p.is_dir():
