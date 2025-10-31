@@ -8,4 +8,4 @@ if [ -z "$REPONAME" ]; then
   exit 1
 fi
 mkdir -p docs
-python src/main.py $REPONAME docs
+python src/main.py "$REPONAME/" docs
