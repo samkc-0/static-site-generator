@@ -20,7 +20,7 @@ def block_to_block_type(block: str) -> BlockType:
         return BlockType.HEADING
     if re.match(r"```.*?```", block, re.DOTALL):
         return BlockType.CODE
-    if matches(r"> .*?", block):
+    if matches(r"^> ?.*$", block):
         return BlockType.QUOTE
     if matches(r"^- .*?$", block):
         return BlockType.UNORDERED_LIST

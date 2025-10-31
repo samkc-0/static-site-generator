@@ -1,3 +1,4 @@
+import re
 from block import block_to_block_type, BlockType
 from parser import parse
 from htmlnode import HTMLNode, LeafNode, ParentNode
@@ -32,8 +33,19 @@ def md_to_html_node(text: str):
                 pre = ParentNode("pre", [code])
                 document.append(pre)
             case BlockType.QUOTE:
-                _, text = block.split(" ", 1)
-                document.append(LeafNode("blockquote", text))
+                lines = block.split("\n")
+                blockquoted = []
+                for line in lines:
+                    cap = re.match("> ?(.*)", line)
+                    assert cap, f"impossible blockquote: {line}"
+                    blockquoted.append(cap.group(1))
+                    text_nodes = [parse(line) for line in blockquoted]
+                    paragraphs = [
+                        ParentNode("p", [text_node_to_html_node(t) for t in line])
+                        for line in text_nodes
+                        if line
+                    ]
+                document.append(ParentNode("blockquote", paragraphs))
             case BlockType.UNORDERED_LIST:
                 ul = list_block_to_html_node(block, "ul")
                 document.append(ul)

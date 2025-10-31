@@ -1,4 +1,6 @@
+import re
 from functools import wraps
+from block import block_to_block_type, BlockType, matches, md_to_blocks
 import pytest
 from helpers import md_to_html_node
 
@@ -18,7 +20,7 @@ test_cases = [
     ),
     (
         "> This is a blockquote",
-        "<blockquote>This is a blockquote</blockquote>",
+        "<blockquote><p>This is a blockquote</p></blockquote>",
     ),
     (
         "- this is important\n- and so is this",
@@ -73,4 +75,33 @@ the **same** even with inline stuff
 This is text that _should_ remain
 the **same** even with inline stuff
 </code></pre></div>"""
+    )
+
+
+def test_regex_blockquote():
+    text = '> "I am in fact a Hobbit in all but size."'
+    assert re.match(r"^> .*?$", text)
+    md = """> "I am in fact a Hobbit in all but size."
+> 
+> -- J.R.R. Tolkien"""
+    for line in md.split("\n"):
+        assert re.match(r"^> .*?$", line)
+    assert matches(r"^> .*?$", md)
+
+
+def test_blockquote():
+    md = """> "I am in fact a Hobbit in all but size."
+> 
+> -- J.R.R. Tolkien"""
+    blocks = md_to_blocks(md)
+    assert len(blocks) == 1
+    for b in blocks:
+        assert b.startswith("> ")
+        assert block_to_block_type(b) == BlockType.QUOTE
+
+    node = md_to_html_node(md)
+    html = node.to_html()
+    assert (
+        html
+        == '<div><blockquote><p>"I am in fact a Hobbit in all but size."</p><p>-- J.R.R. Tolkien</p></blockquote></div>'
     )
